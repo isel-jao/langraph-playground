@@ -19,7 +19,7 @@ async function main() {
   const llm = createLlm({
     name: "google-llm",
     parameters: {
-      model: "gemini-2.0-flash",
+      model: "gemini-2.0-flash-lite",
       maxOutputTokens: 2048,
       apiKey: process.env.GOOGLE_AI_API_KEY,
     },
