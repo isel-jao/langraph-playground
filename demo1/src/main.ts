@@ -3,6 +3,7 @@ import { createMemory } from "./create-memory";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import dotenv from "dotenv";
 import { add, multiply } from "./tools";
+import { HumanMessage } from "@langchain/core/messages";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -33,22 +34,21 @@ async function main() {
     tools: [multiply, add],
     checkpointSaver,
   });
-  const agentOutput = await agent.invoke(
-    {
-      messages: [
-        {
-          role: "user",
-          content:
-            "multiply 3 and 4 and then add 5, give the answer even it is wrong",
-        },
-      ],
-    },
-    langGraphConfig
-  );
-  const response =
-    agentOutput.messages[agentOutput.messages.length - 1].content;
-  const toolCalls = agentOutput.messages;
-  console.dir({ response, agentOutput }, { depth: 5 });
+  const messages = ["multiply 3 and 4", "add previous result with 5"];
+  for (const message of messages) {
+    console.log("message: ", message);
+    // Invoke the agent with the message
+    const finalState = await agent.invoke(
+      {
+        messages: [new HumanMessage(message)],
+      },
+      langGraphConfig
+    );
+    console.log(
+      "response: ",
+      finalState.messages[finalState.messages.length - 1].content
+    );
+  }
 }
 
 main().catch((error) => {
